@@ -26,4 +26,4 @@ To run the app locally, follow these steps:
 
 
 ## Credits
-The Incident Reporting Web App was created by Amanuel Tesfaye, Courtney Hammonds, Ian Duncan and Sierra Agee as a project for SEO Tech.
+The Incident Reporting Web App was created by Amanuel Tesfaye, Courtney Hammonds, Ian Duncan and Sierra Agee as a final project for SEO Tech.
