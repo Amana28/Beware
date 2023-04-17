@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+
+{% block autocomplete %}
+<script>
+    let autocomplete;
+    function initAutocomplete() {
+        autocomplete = new google.maps.places.Autocomplete(document.getElementById("Where?"), 
+        {
+            componentRestrictions: {'country': ['us']},
+            fields: ['plae_id', 'geometry', 'name']
+        });
+    }
+</script>
+{% endblock %}
+
+{% block navbar %} 
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="{{ url_for('home') }}">Beware</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu 
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('beware_map') }}">Beware Map</a></li>
+                {% if session.username%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
+                {%else%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Log In</a></li>
+                {%endif%}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block masthead %} 
+<!-- Masthead-->
+<style>
+  header {
+    height: 75% !important;
+  }
+
+  textarea {
+    width: 600px !important;
+    height: 75px;
+    resize: auto;
+  }
+
+  .btn {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+  }
+</style>
+
+<script>function validateFileType(input){
+  var fileName = input.value,
+      idxDot = fileName.lastIndexOf(".") + 1,
+      extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+  if (["jpg", "jpeg", "png"].includes(extFile)){
+      //TO DO
+  } else {
+      alert("Only jpg/jpeg and png files are allowed!");
+      input.value = ""
+  }
+}
+
+</script>
+<header class="masthead">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+
+            <div class="text-center" style="margin-top:3em;">
+                <h1 class="mx-auto my-0 text-uppercase" style="font-size:4em; margin-top:40px!important;">NEW REPORT</h1>
+                <form style="color:white; text-align:left;" method="POST" action="/report" enctype=multipart/form-data>
+                  <!-- Search input-->
+                  <div class="form-group">
+                    <label class="control-label" for="Where?">Where?</label>
+                    <div style="width: 120%;">
+                      <input id="Where?" name="where" type="search" placeholder="123 Sesame Street" class="form-control input-md" required="required" aria-required="true">
+                    </div>
+                  </div>
+                  <!-- Multiple Radios (inline) -->
+                  <div class="form-group">
+                    <label class="control-label" for="type">Type?</label>
+                    <div class="incident-types" style="width:auto; margin-left:10px; margin-right:10px;"> 
+                      <label class="radio-inline" for="type-0">
+                        <input type="radio" name="type" id="type-0" value="discrimination" checked="checked">
+                        Hate Crime
+                      </label> 
+                      <br>
+                      <label class="radio-inline" for="type-1">
+                        <input type="radio" name="type" id="type-1" value="racial_profiling">
+                        Racial Profiling
+                      </label> 
+                      <label class="radio-inline" for="type-2">
+                        <input type="radio" name="type" id="type-2" value="customer_service">
+                        Bad Customer Service
+                      </label> 
+                      <label class="radio-inline" for="type-3">
+                        <input type="radio" name="type" id="type-3" value="car_accident">
+                        Car Accident
+                      </label> 
+                      <br>
+                      <label class="radio-inline" for="type-4">
+                        <input type="radio" name="type" id="type-4" value="robbery">
+                        Robbery/ Theft
+                      </label> 
+                      <br>
+                      <label class="radio-inline" for="type-5">
+                        <input type="radio" name="type" id="type-5" value="burglary">
+                        Burglary
+                      </label> 
+                      <br>
+                      <label class="radio-inline" for="type-6">
+                        <input type="radio" name="type" id="type-6" value="assault">
+                        Assault
+                      </label>  
+                      <br>
+                      <label class="radio-inline" for="type-7">
+                        <input type="radio" name="type" id="type-7" value="police">
+                        Missing Person
+                      </label>
+                      <br>
+                      <label class="radio-inline" for="type-8">
+                        <input type="radio" name="type" id="type-8" value="other">
+                        Other
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Date -->
+                  <div class="formbuilder-date form-group field-date">
+                    <label for="date" class="formbuilder-date-label">When<span class="formbuilder-required"></span></label>
+                    <input type="datetime-local" class="date" name="date" access="false" id="date" required="required" aria-required="true">
+                  </div>
+                  <!-- Textarea -->
+                  <div class="form-group">
+                    <label class="control-label" for="description">Description</label>
+                    <div class="col-md-4">                     
+                      <textarea class="form-control" id="description" name="description" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <input type="file" name= "file" id="file" accept=".jpg,.jpeg,.png" onchange="validateFileType(this)">
+                  </div>
+                  <!-- Button -->
+                    <!-- keep this button inside the form tag -->
+                    <label class="control-label" for="Submit"></label>
+                    <div>
+                      <button id="Submit" name="Submit" class="btn btn-primary" style="margin-left: 140px;">Submit</button>
+                    </div>
+                </form>
+                <!-- Back To Profile Button -->
+                    <label class="control-label" for="Submit"></label>
+                    <div>
+                      <a id="Back" name="Back" style="width:250px; margin-left:80px;" class="btn btn-primary" href="{{ url_for('profile') }}">Back to Profile</a>
+                    </div>  
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block url %}
+<script async src={{autocomplete_src}}></script>
+{% endblock %}
+

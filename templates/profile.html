@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block navbar %} 
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="{{ url_for('home') }}">Beware</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu 
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('beware_map') }}">Beware Map</a></li>
+                {% if session.username%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
+                {%else%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Log In</a></li>
+                {%endif%}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block masthead %} 
+<!-- Masthead-->
+<style>
+    header {
+        height: auto !important;
+    }
+</style>
+
+<header class="masthead">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <h1 class="mx-auto my-0 text-uppercase" style="font-size:4em; margin-top:50px!important;">{{username}}</h1>
+                <a class="btn btn-primary" style="margin-left: auto; margin-right: auto; margin-bottom:25px;" href="{{ url_for('report') }}">Click to report an incident</a>
+                
+                <!-- list reports for courtney testing purposes only-->  
+                <div class="user-report-table" >
+                    <h2 class="text-white-50 mx-auto mt-2 mb-5">Your Reported Incidents</h2>
+                    <ul class="responsive-table">
+                        <li class="table-header">
+                        <div class="col col-1">Date</div>
+                        <div class="col col-2">Incident Type</div>
+                        <div class="col col-3">Address</div>
+                        <div class="col col-4">Description</div>
+                        <div class="col col-5">Delete</div>
+                        </li>
+                        {% for item in user_reports %}
+                        <li class="table-row">
+                        <div class="col col-1" data-label="Date">{{item.date}}</div>
+                        <div class="col col-2" data-label="Incident">{{types[item.incident]}}</div>
+                        <div class="col col-3" data-label="Address">{{item.address}}</div>
+                        <div class="col col-4" data-label="Descrption">{{item.description}}</div>
+                        <script>
+                            function delete_request(itemId) {
+                            fetch("/delete", {
+                                method: "POST",
+                                body: JSON.stringify({ noteId: itemId }),
+                            }).then((_res) => {
+                                window.location.href = "/myprofile";
+                            });
+                            }
+                        </script>
+                        <button type="button" class="col-5 delete"  onclick="delete_request({{item.id}})">X</button></span></a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div> 
+    
+</header>
+{% endblock %}

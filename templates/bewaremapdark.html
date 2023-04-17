@@ -1,0 +1,345 @@
+{% extends 'layout.html' %}
+
+{% block navbar %} 
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="{{ url_for('home') }}">Beware</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu 
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                {% if session.username%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
+                {%else%}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Log In</a></li>
+                {%endif%}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block bewaremap %}
+<div style="margin-top: -8em;">
+<script type="text/javascript">
+
+// All icon types for the markers
+    var iconBase =
+    'https://maps.google.com/mapfiles/kml/';
+    var icons = {
+        robbery: {
+        icon: "/static/icons/robbery.png",
+        name: "Robbery/Theft",
+        },
+        burglary: {
+        icon: "/static/icons/burglary.png",
+        name: "Burglary",
+        },
+        police: {
+        icon: "/static/icons/person.png",
+        name: "Missing Person",
+        },
+        discrimination: {
+        icon: "/static/icons/hate-crime.png",
+        name: "Hate Crime",
+        },
+        racial_profiling: {
+        icon: "/static/icons/police.png" ,
+        name: "Racial Profiling",
+        },
+        customer_service: {
+        icon: "/static/icons/customer-service.png" ,
+        name: "Bad Customer Service",
+        },
+        car_accident: {
+        icon: "/static/icons/car-accident.png",
+        name: "Car Accident",
+        },
+        assault: {
+        icon: "/static/icons/punch.png",
+        name: "Assault",
+        },
+        other:{
+        icon: "/static/icons/star.png",
+        name:"Other",
+        }
+    };
+
+    var map;
+    
+    function initMap() {
+
+        var mapTypeStylesArray = [
+        {
+            "stylers": [
+                {
+                    "hue": "#ff1a00"
+                },
+                {
+                    "invert_lightness": true
+                },
+                {
+                    "saturation": -100
+                },
+                {
+                    "lightness": 33
+                },
+                {
+                    "gamma": 0.5
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#2D333C"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "color": "#000000"
+                },
+                {
+                    "lightness": 17
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "color": "#000000"
+                },
+                {
+                    "lightness": 29
+                },
+                {
+                    "weight": 0.2
+                }
+            ]
+        },
+        {
+            "featureType": "road.arterial",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#000000"
+                },
+                {
+                    "lightness": 18
+                }
+            ]
+        },
+        {
+            "featureType": "road.local",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#000000"
+                },
+                {
+                    "lightness": 16
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#000000"
+                },
+                {
+                    "lightness": 19
+                }
+            ]
+        }
+    ];
+        
+    let mapoptions = {
+        center: { lat: {{latitude}}, lng: {{longitude}} },
+        zoom: 12,
+        styles: mapTypeStylesArray 
+        
+    }
+
+    map = new google.maps.Map(document.getElementById("map"), mapoptions);
+
+
+
+
+
+
+    var tempLng = 40.71296489548469;
+    var tempLat = -74.00623338293839;
+
+    var infowindow, marker, contentString;
+    infowindow = new google.maps.InfoWindow();
+    {% for value in values %}
+        contentString = 
+            '<div>' +
+            '<h5> ' + icons['{{ value.incident }}'].name + '</h5>' +
+            '<p><b> ' + '<b>{{ value.address }}</b>' + '</b>' +
+            '<br><b>' + '<b>Date: {{ value.date }}</b>' + '</b></p>' +  
+            '<p> '  + '{{ value.description }}' + '</p>' +
+            '{% if value.image_file is not none %}' +
+            '<img src= "/static/uploads/' + '{{ value.image_file }}' + ' " style="width:200px;height:200px; display: block;margin-left: auto;margin-right: auto;"/>'+
+            '{% endif %}' +
+            '</div>'
+        
+        marker = new google.maps.Marker({
+            position: new google.maps.LatLng('{{ value.latitude }}', '{{ value.longitude }}'),
+            map: map,
+            icon: {url:icons['{{value.incident}}'].icon, scaledSize: new google.maps.Size(40,40)},
+        });
+        marker.content = contentString
+        google.maps.event.addListener(marker, 'click', (function(marker) {
+            return function() {
+            infowindow.setContent(this.content);
+            infowindow.open(map, marker);
+            }
+        })(marker));
+        
+        
+    {%endfor%}
+    
+    
+    // test markers
+    /*
+    var marker1 = new google.maps.Marker({
+    position: new google.maps.LatLng(40.71296489548469, -74.00623338293839),
+    map: map,
+    icon: {url:icons["assault"].icon, scaledSize: new google.maps.Size(40,40)},
+    
+    });
+    
+
+    var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(40.70, -74.00623338293839),
+    map: map,
+    icon: {url:icons["robbery"].icon, scaledSize: new google.maps.Size(40,40)},
+    
+    });
+
+    var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(40.70, -74.01623338293839),
+    map: map,
+    icon: {url:icons["discrimination"].icon, scaledSize: new google.maps.Size(40,40)},
+    
+    });
+    // end of marker test
+    */
+
+    infoWindow = new google.maps.InfoWindow();
+    marker = new google.maps.Marker({map});
+    const locationButton = document.createElement("button");
+    locationButton.textContent = "Pan to Current Location";
+    locationButton.classList.add("custom-map-control-button");
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+    locationButton.addEventListener("click", () => {
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+            const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+            };
+            marker.setPosition(pos);
+            map.setCenter(pos);
+            },
+            () => {
+            handleLocationError(true, infoWindow, map.getCenter());
+            }
+        );
+        } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+        }
+    });
+    
+    }
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(
+        browserHasGeolocation
+        ? "Error: The Geolocation service failed."
+        : "Error: Your browser doesn't support geolocation."
+    );
+    infoWindow.open(map);
+    
+    }
+
+
+</script>
+</div>
+{% endblock %}
+
+{% block masthead %} 
+<!-- Masthead-->
+<header class="mastheadformap">
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <br><h1 class="mx-auto my-0 text-uppercase" style="color:white;">BEWARE Map</h1> <br>
+                <a class="btn btn-primary" href="{{ url_for('beware_map') }}">Enter Another location</a> 
+            </div>
+        </div>
+    </div>
+    <br>
+    <div id="map"></div>  
+    <br><br><br><br><br><br><br><br><br>
+    <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <a class="btn btn-primary" href="{{ url_for('beware_map_light') }}">Light Mode</a>
+            </div>
+        </div>
+    </div>
+    <br><br>
+    <div style="text-align:center; border: 2px solid black; margin:50px; padding: 20px">
+        <a class="btn btn-primary" href="{{ url_for('show_all_dark') }}" style="background-color:rgb(80, 77, 77); color:white">Show All</a>
+        <a class="btn btn-primary" href="{{ url_for('robbery_dark') }}" style="background-color:rgb(86, 54, 134); color: white" >Robbery</a>
+        <a class="btn btn-primary" href="{{ url_for('burglary_dark') }}" style="background-color:rgb(86, 54, 134); color: white">Burglary</a>
+        <a class="btn btn-primary" href="{{ url_for('assault_dark') }}" style="background-color:rgb(125, 53, 67); color: white">Assault</a>
+        <a class="btn btn-primary" href="{{ url_for('hate_crime_dark') }}" style="background-color:rgb(125, 53, 67); color: white">Hate Crime</a>
+        <a class="btn btn-primary" href="{{ url_for('racial_profiling_dark') }}" style="background-color:rgb(125, 53, 67); color: white">Racial Profiling</a><p></p><br>
+        <a class="btn btn-primary" href="{{ url_for('bad_customer_service_dark') }}" style="background-color:rgb(54, 107, 55); color:white">Bad Customer Service</a>
+        <a class="btn btn-primary" href="{{ url_for('car_accident_dark') }}" style="background-color:rgb(34, 29, 119); color: white">Car Accident</a>
+        <a class="btn btn-primary" href="{{ url_for('missing_person_dark') }}" style="background-color:rgb(55, 69, 11); color:white">Missing Person</a>
+        <a class="btn btn-primary" href="{{ url_for('other_dark') }}">Other</a>
+    </div>
+    <br><br><br>
+    <h2 style="text-align:center; color: white;"> Key </h2>
+    <div class="text-white-50" style="text-align:center; border: 2px solid black;margin:50px; padding: 20px">
+            <img src= '/static/icons/robbery.png' style="width:70px;height:70px;color:white"> Robbery/Theft &nbsp;&nbsp;
+            <img src= '/static/icons/burglary.png' style="width:70px;height:70px;color:white"> Burglary &nbsp;&nbsp;
+            <img src= '/static/icons/person.png' style="width:70px;height:70px;color:white"> Missing Person &nbsp;&nbsp;
+            <img src= '/static/icons/punch.png' style="width:70px;height:70px;color:white"> Assault &nbsp;&nbsp;<br><br>
+            <img src= '/static/icons/hate-crime.png' style="width:70px;height:70px;color:white" > Hate Crime &nbsp;&nbsp;
+            <img src= '/static/icons/car-accident.png' style="width:70px;height:70px;color:white"> Car accident &nbsp;&nbsp;
+            <img src= '/static/icons/customer-service.png' style="width:70px;height:70px"> Bad customer service &nbsp;&nbsp;
+            <img src= '/static/icons/police.png' style="width:70px;height:70px;color:white"> Racial profiling &nbsp;&nbsp;
+            <img src= '/static/icons/star.png' style="width:70px;height:70px;color:white"> Other &nbsp;&nbsp;
+    </div>
+</header>
+
+
+    
+{% endblock %}
+
+{% block url %}
+<script async src={{map_src}}></script>
+{% endblock %}
