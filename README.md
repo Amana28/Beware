@@ -25,5 +25,5 @@ To run the app locally, follow these steps:
 - Open your web browser and navigate to http://localhost:5000 to view the app.
 
 
-Credits
+## Credits
 The Incident Reporting Web App was created by Amanuel Tesfaye, Courtney Hammonds, Ian Duncan and Sierra Agee as a project for SEO Tech.
